@@ -6,6 +6,10 @@ module.exports.initialConfig = async () =>{
         {
             name: 'ping',
             description: 'Replies with Pong!',
+        },
+        {
+            name: 'pato',
+            description: 'Ban no pato!',
         }
     ]
 
