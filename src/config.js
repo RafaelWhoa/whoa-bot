@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { REST, Routes } = require('discord.js');
+const logger = require('./logger.js');
 
 module.exports.initialConfig = async () =>{
     const commands = [
@@ -16,12 +17,12 @@ module.exports.initialConfig = async () =>{
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
     try {
-        console.log('Started refreshing application (/) commands.')
+        logger.info('Started refreshing application (/) commands.')
 
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
 
-        console.log('Successfully reloaded application (/) commands.')
+        logger.info('Successfully reloaded application (/) commands.')
     }catch (e){
-        console.error(e)
+        logger.error(e)
     }
 }

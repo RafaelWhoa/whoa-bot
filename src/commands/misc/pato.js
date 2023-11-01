@@ -6,8 +6,11 @@ module.exports = {
         .setName('pato')
         .setDescription('Ban no pato!'),
     async execute(interaction) {
+        const locales = {
+            "pt-BR": "Pato foi banido!",
+        }
         await interaction.deferReply();
-        await wait(4000);
-        await interaction.editReply('Pato foi banido!');
+        await wait(1000);
+        await interaction.editReply(locales[interaction.locale] ?? "Pato has been banned!");
     }
 }
