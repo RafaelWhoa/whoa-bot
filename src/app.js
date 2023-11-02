@@ -4,10 +4,17 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 const config = require('./config.js')
 const logger = require('./logger.js')
+const patoBans = require('./models/PatoBans')
+const aniversarios = require('./models/Aniversarios')
+
 
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
+
+
 client.once(Events.ClientReady, () => {
+    patoBans.sync().then(() => {logger.info('PatoBans table synced')});
+    aniversarios.sync().then(() => {logger.info('Aniversarios table synced')});
     logger.info(`Logged in as ${client.user.tag}!`);
 })
 
