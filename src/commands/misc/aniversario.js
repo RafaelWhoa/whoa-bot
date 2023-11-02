@@ -4,6 +4,7 @@ const aniversario = require('../../models/Aniversarios.js');
 const logger = require('../../logger.js');
 const dayjs = require('dayjs');
 const customParseFormat = require('dayjs/plugin/customParseFormat');
+const { CalculateNextAge } = require('../../utils/birthday.js');
 dayjs.extend(customParseFormat);
 
 module.exports = {
@@ -97,21 +98,25 @@ module.exports = {
                 const birthday = instance.dataValues.birthday;
                 const day = dayjs(birthday).format('DD');
                 const month = dayjs(birthday).format('MM');
-                const year = dayjs(birthday).format('YYYY');
-                message += `<@${username}> - ${day}/${month}/${year}\n`;
+                message += `<@${username}> - ${day}/${month}\n`;
             });
             await interaction.reply(message);
         } else if (subcommand === 'usuario') {
-            const target = interaction.options.getUser('user');
-            const instance = await aniversario.findOne({where: {user_id: target.id}});
-            let message = '';
-            const username = instance.dataValues.user_id;
-            const birthday = instance.dataValues.birthday;
-            const day = dayjs(birthday).format('DD');
-            const month = dayjs(birthday).format('MM');
-            const year = dayjs(birthday).format('YYYY');
-            message += `<@${username}> - ${day}/${month}/${year}\n`;
-            await interaction.reply(message);
+            try{
+                const target = interaction.options.getUser('user');
+                const instance = await aniversario.findOne({where: {user_id: target.id}});
+                let message = '';
+                const username = instance.dataValues.user_id;
+                const birthday = instance.dataValues.birthday;
+                const day = dayjs(birthday).format('DD');
+                const month = dayjs(birthday).format('MM');
+                const year = dayjs(birthday).format('YYYY');
+                message += `<@${username}> irá fazer ${CalculateNextAge(birthday).year() - year} anos em ${day}/${month}/${CalculateNextAge(birthday).year()}\n`;
+                await interaction.reply(message);
+            }catch (error) {
+                await interaction.reply({content: 'A data do aniversário desse usuário não foi adicionada!', ephemeral: true});
+                logger.error(`Error to get birthday: ${error}`, error);
+            }
         }
     }
 }
