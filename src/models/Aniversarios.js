@@ -13,6 +13,10 @@ const Aniversarios = dbConnection.define('aniversarios', {
         type: Sequelize.STRING,
         allowNull: false,
     },
+    user_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
     birthday: {
         type: Sequelize.DATE,
         allowNull: false,
