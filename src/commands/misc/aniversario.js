@@ -10,15 +10,30 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('aniversario')
         .setDescription('Informações sobre aniversários!')
-        .addSubcommand(subcommand => subcommand
-            .setName('add')
-            .setDescription('Adiciona um aniversário!')
-            .addUserOption(option => option.setName('user')
-                .setDescription('Usuário')
-                .setRequired(true))
-            .addStringOption(option => option.setName('birthday')
-                .setDescription('Data de aniversário (DD/MM/YYYY)')
-                .setRequired(true))),
+        .addSubcommandGroup(subcommandGroup => subcommandGroup
+            .setName('config')
+            .setDescription('Configurações de aniversários.')
+            .addSubcommand(subcommand => subcommand
+                .setName('add')
+                .setDescription('Adiciona um aniversário.')
+                .addUserOption(option => option.setName('user')
+                    .setDescription('Usuário')
+                    .setRequired(true))
+                .addStringOption(option => option.setName('birthday')
+                    .setDescription('Data de aniversário (DD/MM/YYYY)')
+                    .setRequired(true))))
+        .addSubcommandGroup(subcommandGroup => subcommandGroup
+            .setName('ver')
+            .setDescription('Verifica aniversários.')
+            .addSubcommand(subcommand => subcommand
+                .setName(
+                    'todos')
+                .setDescription('Ver todos os aniversários.'))
+            .addSubcommand(subcommand => subcommand
+                .setName('usuario')
+                .setDescription('Ver data do aniversário de um usuário específico.')
+                .addUserOption(option => option.setName('user')
+                    .setDescription('Usuário que deseja ver a data do aniversário.')))),
 
     async execute(interaction) {
         const subcommand = interaction.options.getSubcommand();
@@ -66,6 +81,31 @@ module.exports = {
                 logger.error(`Error to add birthday: ${error}`, error);
                 await interaction.reply({ content: locales[interaction.locale][subcommand].error, ephemeral: true });
             }
+        }
+        else if(subcommand === 'todos') {
+            const instances = await aniversario.findAll();
+            let message = '';
+            instances.forEach(instance => {
+                const username = instance.dataValues.username;
+                const birthday = instance.dataValues.birthday;
+                const day = dayjs(birthday).format('DD');
+                const month = dayjs(birthday).format('MM');
+                const year = dayjs(birthday).format('YYYY');
+                message += `@${username} - ${day}/${month}/${year}\n`;
+            });
+            await interaction.reply(message);
+        }
+        else if(subcommand === 'usuario'){
+            const instances = await aniversario.findOne({ where: { username: target.username } });
+            let message = '';
+            instances.forEach(instance => {
+                const username = instance.dataValues.username;
+                const birthday = instance.dataValues.birthday;
+                const day = dayjs(birthday).format('DD');
+                const month = dayjs(birthday).format('MM');
+                const year = dayjs(birthday).format('YYYY');
+                message += `@${username} - ${day}/${month}/${year}\n`;
+            });
         }
     }
 }
