@@ -2,7 +2,6 @@ const SlashCommandBuilder = require('discord.js').SlashCommandBuilder;
 const wait = require('node:timers/promises').setTimeout;
 const patoBans = require('../../models/PatoBans.js');
 const logger = require('../../logger.js');
-const {Sequelize} = require("sequelize");
 
 async function incrementCounter() {
     try {

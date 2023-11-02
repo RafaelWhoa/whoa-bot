@@ -6,6 +6,8 @@ const Aniversarios = dbConnection.define('aniversarios', {
     id: {
         type: Sequelize.UUID,
         primaryKey: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
     },
     username: {
         type: Sequelize.STRING,

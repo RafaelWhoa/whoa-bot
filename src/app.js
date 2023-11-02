@@ -15,9 +15,11 @@ const client = new Client({intents: [GatewayIntentBits.Guilds]});
 client.once(Events.ClientReady, () => {
     patoBans.sync().then(() => {logger.info('PatoBans table synced')});
     aniversarios.sync().then(() => {logger.info('Aniversarios table synced')});
-    logger.info(`Logged in as ${client.user.tag}!`);
 })
 
+client.login(process.env.TOKEN).then(r => {logger.info(`Logged in as ${client.user.tag}!`)})
+
+const commands = [];
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
@@ -31,13 +33,14 @@ for (const folder of commandFolders) {
         // Set a new item in the Collection with the key as the command name and the value as the exported module
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
+            commands.push(command.data.toJSON());
         } else {
             console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
     }
 }
 
-config.initialConfig();
+config.initialConfig(commands).then(r => {logger.info('SlashCommands loaded')});
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
@@ -59,5 +62,3 @@ client.on(Events.InteractionCreate, async interaction => {
         }
     }
 });
-
-client.login(process.env.TOKEN)
