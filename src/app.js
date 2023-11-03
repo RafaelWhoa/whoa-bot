@@ -6,6 +6,8 @@ const config = require('./config.js')
 const logger = require('./logger.js')
 const patoBans = require('./models/PatoBans')
 const aniversarios = require('./models/Aniversarios')
+const schedule = require("node-schedule");
+const {GetTodayBirthdays} = require("./utils/birthday");
 
 
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
@@ -40,7 +42,11 @@ for (const folder of commandFolders) {
     }
 }
 
-config.initialConfig(commands).then(r => {logger.info('SlashCommands loaded')});
+config.initialConfig(commands, client).then(r => {logger.info('SlashCommands loaded')});
+
+const scheduleBirthdayMessage = schedule.scheduleJob('00 00 * * *', async function () {
+    await GetTodayBirthdays(client);
+})
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
