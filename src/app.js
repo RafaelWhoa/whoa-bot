@@ -16,7 +16,7 @@ const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
 client.once(Events.ClientReady, () => {
     patoBans.sync().then(() => {logger.info('PatoBans table synced')});
-    aniversarios.sync().then(() => {logger.info('Aniversarios table synced')});
+    aniversarios.sync({force: true}).then(() => {logger.info('Aniversarios table synced')});
 })
 
 client.login(process.env.TOKEN).then(r => {logger.info(`Logged in as ${client.user.tag}!`)})
@@ -44,7 +44,7 @@ for (const folder of commandFolders) {
 
 config.initialConfig(commands, client).then(r => {logger.info('SlashCommands loaded')});
 
-const scheduleBirthdayMessage = schedule.scheduleJob('00 00 * * *', async function () {
+const scheduleBirthdayMessage = schedule.scheduleJob('57 09 * * *', async function () {
     await GetTodayBirthdays(client);
 })
 

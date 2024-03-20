@@ -1,25 +1,28 @@
 const dbConfig = require('../db/dbConfig.js')
-const {Sequelize} = require("sequelize");
+const {Sequelize, DataTypes} = require("sequelize");
 let dbConnection = dbConfig.connection;
 
 const Aniversarios = dbConnection.define('aniversarios', {
     id: {
-        type: Sequelize.UUID,
+        type: DataTypes.UUID,
         primaryKey: true,
         allowNull: false,
-        defaultValue: Sequelize.UUIDV4,
+        defaultValue: DataTypes.UUIDV4,
     },
     username: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     user_id: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     birthday: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: false,
+    },
+    server_id: {
+        type: DataTypes.STRING,
     },
 })
 

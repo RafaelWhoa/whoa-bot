@@ -7,10 +7,10 @@ module.exports.initialConfig = async (commands, client) =>{
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
     try{
-        ScheduleBirthdayMessage(client);
+        //scheduleBirthdayMessage(client);
     }
     catch (e){
-        logger.error('Failed to start birthday jobs');
+        logger.error('Failed to start birthday jobs' + e.message);
     }
 
     try {

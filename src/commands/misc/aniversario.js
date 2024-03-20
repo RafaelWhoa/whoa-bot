@@ -4,7 +4,8 @@ const aniversario = require('../../models/Aniversarios.js');
 const logger = require('../../logger.js');
 const dayjs = require('dayjs');
 const customParseFormat = require('dayjs/plugin/customParseFormat');
-const { CalculateNextAge } = require('../../utils/birthday.js');
+const {CalculateNextAge} = require('../../utils/birthday.js');
+const {where} = require("sequelize");
 dayjs.extend(customParseFormat);
 
 module.exports = {
@@ -80,7 +81,8 @@ module.exports = {
                     await aniversario.create({
                         username: target.username,
                         user_id: target.id,
-                        birthday: birthdayFormatted
+                        birthday: birthdayFormatted,
+                        server_id: interaction.guild.id,
                     });
                     await interaction.deferReply();
                     await wait(1000);
@@ -91,7 +93,11 @@ module.exports = {
                 await interaction.reply({content: locales[interaction.locale][subcommand].error, ephemeral: true});
             }
         } else if (subcommand === 'todos') {
-            const instances = await aniversario.findAll();
+            const instances = await aniversario.findAll({
+                where: {
+                    server_id: interaction.guild.id,
+                }
+            });
             let message = 'Aniverários dos batatas:\n';
             instances.forEach(instance => {
                 const username = instance.dataValues.user_id;
@@ -102,7 +108,7 @@ module.exports = {
             });
             await interaction.reply(message);
         } else if (subcommand === 'usuario') {
-            try{
+            try {
                 const target = interaction.options.getUser('user');
                 const instance = await aniversario.findOne({where: {user_id: target.id}});
                 let message = '';
@@ -113,8 +119,11 @@ module.exports = {
                 const year = dayjs(birthday).format('YYYY');
                 message += `<@${username}> irá fazer ${CalculateNextAge(birthday).year() - year} anos em ${day}/${month}/${CalculateNextAge(birthday).year()}\n`;
                 await interaction.reply(message);
-            }catch (error) {
-                await interaction.reply({content: 'A data do aniversário desse usuário não foi adicionada!', ephemeral: true});
+            } catch (error) {
+                await interaction.reply({
+                    content: 'A data do aniversário desse usuário não foi adicionada!',
+                    ephemeral: true
+                });
                 logger.error(`Error to get birthday: ${error}`, error);
             }
         }
