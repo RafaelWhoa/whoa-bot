@@ -98,7 +98,7 @@ module.exports = {
                     server_id: interaction.guild.id,
                 }
             });
-            let message = 'Aniverários dos batatas:\n';
+            let message = 'Aniverários do servidor:\n';
             instances.forEach(instance => {
                 const username = instance.dataValues.user_id;
                 const birthday = instance.dataValues.birthday;
