@@ -1,13 +1,16 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-require('dotenv').config();
-const config = require('./config.js')
-const logger = require('./logger.js')
-const patoBans = require('./models/PatoBans')
-const aniversarios = require('./models/Aniversarios')
-const schedule = require("node-schedule");
-const {GetTodayBirthdays} = require("./utils/birthday");
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
+import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
+import dotenv from 'dotenv';
+import {initialConfig} from './config.js';
+import logger from './logger.js';
+import {PatoBans} from './models/PatoBans.js';
+import {Aniversarios} from './models/Aniversarios.js';
+import schedule from 'node-schedule';
+import {GetTodayBirthdays} from './utils/birthday.js';
+
+dotenv.config();
 
 
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
@@ -15,14 +18,16 @@ const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
 
 client.once(Events.ClientReady, () => {
-    patoBans.sync().then(() => {logger.info('PatoBans table synced')});
-    aniversarios.sync({force: true}).then(() => {logger.info('Aniversarios table synced')});
+    PatoBans.sync().then(() => {logger.info('PatoBans table synced')});
+    Aniversarios.sync({force: false}).then(() => {logger.info('Aniversarios table synced')});
 })
 
 client.login(process.env.TOKEN).then(r => {logger.info(`Logged in as ${client.user.tag}!`)})
 
 const commands = [];
 client.commands = new Collection();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -31,18 +36,19 @@ for (const folder of commandFolders) {
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
+        const command = await import(filePath);
+        const commandName = command[`${file.substring(0, file.length - 3)}` + 'Commands']
         // Set a new item in the Collection with the key as the command name and the value as the exported module
-        if ('data' in command && 'execute' in command) {
-            client.commands.set(command.data.name, command);
-            commands.push(command.data.toJSON());
+        if ('data' in commandName && 'execute' in commandName) {
+            client.commands.set(commandName.data.name, commandName);
+            commands.push(commandName.data.toJSON());
         } else {
             console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
     }
 }
 
-config.initialConfig(commands, client).then(r => {logger.info('SlashCommands loaded')});
+initialConfig(commands, client).then(r => {logger.info('SlashCommands loaded')});
 
 const scheduleBirthdayMessage = schedule.scheduleJob('57 09 * * *', async function () {
     await GetTodayBirthdays(client);

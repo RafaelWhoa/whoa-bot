@@ -1,8 +1,10 @@
-require('dotenv').config();
-const { REST, Routes } = require('discord.js');
-const logger = require('./logger.js');
+import dotenv from 'dotenv';
+import { REST, Routes } from 'discord.js';
+import logger from './logger.js';
 
-module.exports.initialConfig = async (commands, client) =>{
+dotenv.config();
+
+export const initialConfig = async (commands, client) =>{
 
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 

@@ -1,13 +1,10 @@
-const dbConfig = require('../db/dbConfig.js')
-const {Sequelize} = require("sequelize");
-let dbConnection = dbConfig.connection;
+import sequelize from '../db/dbConfig.js'
+import {DataTypes} from "sequelize";
 
-const PatoBans = dbConnection.define('patobans', {
+export const PatoBans = sequelize.define('patobans', {
     bansCount: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
     },
 })
-
-module.exports = PatoBans;

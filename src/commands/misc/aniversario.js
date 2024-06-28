@@ -1,14 +1,15 @@
-const SlashCommandBuilder = require('discord.js').SlashCommandBuilder;
-const wait = require('node:timers/promises').setTimeout;
-const aniversario = require('../../models/Aniversarios.js');
-const logger = require('../../logger.js');
-const dayjs = require('dayjs');
-const customParseFormat = require('dayjs/plugin/customParseFormat');
-const {CalculateNextAge} = require('../../utils/birthday.js');
-const {where} = require("sequelize");
+// noinspection JSFileReferences
+
+import {SlashCommandBuilder} from 'discord.js'
+import {setTimeout} from "timers/promises";
+import {Aniversarios} from '../../models/Aniversarios.js';
+import logger from '../../logger.js'
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import {CalculateNextAge} from "../../utils/birthday.js";
 dayjs.extend(customParseFormat);
 
-module.exports = {
+export const aniversarioCommands = {
     data: new SlashCommandBuilder()
         .setName('aniversario')
         .setDescription('Informações sobre aniversários!')
@@ -70,22 +71,22 @@ module.exports = {
                 return;
             }
             try {
-                const instance = await aniversario.findOne({where: {username: target.username}});
+                const instance = await Aniversarios.findOne({where: {username: target.username, server_id: interaction.guild.id}});
                 if (instance) {
                     await instance.update({birthday: birthdayFormatted});
                     await instance.save();
                     await interaction.deferReply();
-                    await wait(1000);
+                    await setTimeout(1000);
                     await interaction.editReply('Aniversário adicionado com sucesso!');
                 } else {
-                    await aniversario.create({
+                    await Aniversarios.create({
                         username: target.username,
                         user_id: target.id,
                         birthday: birthdayFormatted,
                         server_id: interaction.guild.id,
                     });
                     await interaction.deferReply();
-                    await wait(1000);
+                    await setTimeout(1000);
                     await interaction.editReply('Aniversário adicionado com sucesso!');
                 }
             } catch (error) {
@@ -93,12 +94,12 @@ module.exports = {
                 await interaction.reply({content: locales[interaction.locale][subcommand].error, ephemeral: true});
             }
         } else if (subcommand === 'todos') {
-            const instances = await aniversario.findAll({
+            const instances = await Aniversarios.findAll({
                 where: {
                     server_id: interaction.guild.id,
                 }
             });
-            let message = 'Aniverários do servidor:\n';
+            let message = 'Aniversários do servidor:\n';
             instances.forEach(instance => {
                 const username = instance.dataValues.user_id;
                 const birthday = instance.dataValues.birthday;
@@ -110,7 +111,7 @@ module.exports = {
         } else if (subcommand === 'usuario') {
             try {
                 const target = interaction.options.getUser('user');
-                const instance = await aniversario.findOne({where: {user_id: target.id}});
+                const instance = await Aniversarios.findOne({where: {user_id: target.id}});
                 let message = '';
                 const username = instance.dataValues.user_id;
                 const birthday = instance.dataValues.birthday;
@@ -124,7 +125,7 @@ module.exports = {
                     content: 'A data do aniversário desse usuário não foi adicionada!',
                     ephemeral: true
                 });
-                logger.error(`Error to get birthday: ${error}`, error);
+                logger.error(`Error to get birthday: ${error}` + error.message);
             }
         }
     }

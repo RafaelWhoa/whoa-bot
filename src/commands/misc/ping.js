@@ -1,13 +1,13 @@
-const SlashCommandBuilder = require('discord.js').SlashCommandBuilder;
-const wait = require('node:timers/promises').setTimeout;
+import {SlashCommandBuilder} from 'discord.js'
+import {setTimeout} from 'timers/promises'
 
-module.exports = {
+export const pingCommands = {
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Replies with Pong!'),
     async execute(interaction) {
         await interaction.deferReply();
-        await wait(4000);
+        await setTimeout(4000);
         await interaction.editReply('Pong!');
     }
 }

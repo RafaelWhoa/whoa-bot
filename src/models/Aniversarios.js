@@ -1,8 +1,7 @@
-const dbConfig = require('../db/dbConfig.js')
-const {Sequelize, DataTypes} = require("sequelize");
-let dbConnection = dbConfig.connection;
+import sequelize from '../db/dbConfig.js'
+import {DataTypes} from "sequelize";
 
-const Aniversarios = dbConnection.define('aniversarios', {
+export const Aniversarios = sequelize.define('aniversarios', {
     id: {
         type: DataTypes.UUID,
         primaryKey: true,
@@ -25,5 +24,3 @@ const Aniversarios = dbConnection.define('aniversarios', {
         type: DataTypes.STRING,
     },
 })
-
-module.exports = Aniversarios;

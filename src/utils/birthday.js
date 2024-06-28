@@ -1,11 +1,9 @@
-const dayjs = require('dayjs');
-const aniversario = require("../models/Aniversarios");
-const sequelize = require('sequelize').Op;
-const dbConfig = require('../db/dbConfig.js')
-const {Sequelize, Op} = require("sequelize");
-let dbConnection = dbConfig.connection;
+import dayjs from "dayjs";
+import {Aniversarios} from "../models/aniversarios.js";
+import {sequelize} from "../db/dbConfig.js";
+import {Op} from "sequelize";
 
-const CalculateNextAge = (birthday) => {
+export const CalculateNextAge = (birthday) => {
     const today = dayjs().startOf('day');
     const nextBirthday = dayjs(birthday).set('year', today.year()).startOf('day');
     if (nextBirthday.isBefore(today)) {
@@ -13,37 +11,36 @@ const CalculateNextAge = (birthday) => {
     }
     return dayjs(nextBirthday);
 }
-module.exports = {CalculateNextAge};
 
-const GetTodayBirthdays = async (client) => {
-    const todayBirthdays = await aniversario.findAll({
-        where: dbConnection
-            .where(dbConnection
+export const GetTodayBirthdays = async (client) => {
+    const todayBirthdays = await Aniversarios.findAll({
+        where: sequelize
+            .where(sequelize
                 .fn('date_part',
                     'day',
-                    dbConnection
+                    sequelize
                         .col('birthday')),
                 '=',
                 dayjs()
                     .format('DD')),
-        and: dbConnection
-            .where(dbConnection
+        and: sequelize
+            .where(sequelize
                 .fn('date_part',
                     'month',
-                    dbConnection.col('birthday')),
+                    sequelize.col('birthday')),
                 '=', dayjs()
                     .format('MM')),
-        [Op.and]: dbConnection.where(dbConnection
+        [Op.and]: sequelize.where(sequelize
                 .fn('date_part',
                     'day',
-                    dbConnection
+                    sequelize
                         .col('birthday')),
             '=',
             dayjs()
-                .format('DD'), dbConnection.where(dbConnection
+                .format('DD'), sequelize.where(sequelize
                     .fn('date_part',
                         'month',
-                        dbConnection.col('birthday')),
+                        sequelize.col('birthday')),
                 '=', dayjs()
                     .format('MM')))});
 
@@ -58,4 +55,3 @@ const GetTodayBirthdays = async (client) => {
         await client.channels.cache.get(process.env.BIRTHDAY_CHANNEL).send(message);
     }
 }
-module.exports = {GetTodayBirthdays};

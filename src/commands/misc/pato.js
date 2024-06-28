@@ -1,24 +1,28 @@
-const SlashCommandBuilder = require('discord.js').SlashCommandBuilder;
-const wait = require('node:timers/promises').setTimeout;
-const patoBans = require('../../models/PatoBans.js');
-const logger = require('../../logger.js');
+import {SlashCommandBuilder} from 'discord.js'
+import {setTimeout} from "timers/promises";
+import {PatoBans} from '../../models/PatoBans.js'
+import logger from '../../logger.js'
 
 async function incrementCounter() {
     try {
-        const instance = await patoBans.findOne();
+        const instance = await PatoBans.findOne();
 
         if (instance) {
             let counter = instance.dataValues.bansCount;
             await instance.update({bansCount: counter + 1});
             await instance.save();
-            return counter;
+            return instance.dataValues.bansCount;
+        }
+        else{
+            await PatoBans.create({bansCount: 1});
+            return 1;
         }
     } catch (error) {
         logger.error(`Error to increment counter: ${error}`, error);
     }
 }
 
-module.exports = {
+export const patoCommands = {
     data: new SlashCommandBuilder()
         .setName('pato')
         .setDescription('Ban no pato!'),
@@ -28,7 +32,7 @@ module.exports = {
             "pt-BR": `Pato foi banido ${counter} vezes!`,
         }
         await interaction.deferReply();
-        await wait(1000);
+        await setTimeout(1000);
         await interaction.editReply(locales[interaction.locale] ?? `Pato has been banned ${counter} times!`);
     }
 }
