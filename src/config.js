@@ -1,21 +1,30 @@
-import "dotenv/config.js";
-import { REST, Routes} from "discord.js";
+import dotenv from 'dotenv';
+import { REST, Routes } from 'discord.js';
+import logger from './logger.js';
 
-const commands = [
-    {
-        name: 'ping',
-        description: 'Replies with Pong!',
+dotenv.config();
+
+export const initialConfig = async (commands, client) =>{
+
+    const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+
+    try{
+        //scheduleBirthdayMessage(client);
     }
-]
+    catch (e){
+        logger.error('Failed to start birthday jobs' + e.message);
+    }
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+    try {
+        logger.info(`Started refreshing ${commands.length} application (/) commands.`)
 
-try {
-    console.log('Started refreshing application (/) commands.')
+        await rest.put(
+            Routes.applicationCommands(process.env.CLIENT_ID),
+            { body: commands },
+        );
 
-    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
-
-    console.log('Successfully reloaded application (/) commands.')
-}catch (e){
-    console.error(e)
+        logger.info(`Successfully reloaded ${commands.length} application (/) commands.`)
+    }catch (e){
+        logger.error(e)
+    }
 }
