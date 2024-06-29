@@ -5,17 +5,11 @@
 # https://docs.docker.com/engine/reference/builder/
 
 ARG NODE_VERSION=18.16.0
-ARG DATABASE
-ARG DB_USER
-ARG TOKEN
-ARG DB_PASSWORD
-ARG CLIENT_ID
-ARG BIRTHDAY_CHANNEL
 
 FROM node:${NODE_VERSION}-alpine
 
 # Use production node environment by default.
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 
 WORKDIR /usr/src/app
@@ -36,7 +30,7 @@ USER node
 COPY . .
 
 # Expose the port that the application listens on.
-EXPOSE 7777
+EXPOSE 5002
 
 # Run the application.
-CMD node src/app.js
+CMD ["npm", "start"]

@@ -15,7 +15,14 @@ dotenv.config();
 
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
-
+console.log('Connecting to DB with the following configuration:');
+console.log({
+    database: process.env.DATABASE,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+});
 
 client.once(Events.ClientReady, () => {
     PatoBans.sync().then(() => {logger.info('PatoBans table synced')});

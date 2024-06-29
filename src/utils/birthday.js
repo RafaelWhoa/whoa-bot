@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {Aniversarios} from "../models/aniversarios.js";
+import {Aniversarios} from "../models/Aniversarios.js";
 import {sequelize} from "../db/dbConfig.js";
 import {Op} from "sequelize";
 
