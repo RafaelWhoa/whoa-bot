@@ -17,7 +17,7 @@ const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
 client.once(Events.ClientReady, () => {
     PatoBans.sync().then(() => {logger.info('PatoBans table synced')});
-    Aniversarios.sync({force: false}).then(() => {logger.info('Aniversarios table synced')});
+    Aniversarios.sync({force: true}).then(() => {logger.info('Aniversarios table synced')});
 })
 
 client.login(process.env.TOKEN).then(r => {logger.info(`Logged in as ${client.user.tag}!`)})
@@ -47,10 +47,6 @@ for (const folder of commandFolders) {
 }
 
 initialConfig(commands, client).then(r => {logger.info('SlashCommands loaded')});
-
-const scheduleBirthdayMessage = schedule.scheduleJob('57 09 * * *', async function () {
-    await GetTodayBirthdays(client);
-})
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;

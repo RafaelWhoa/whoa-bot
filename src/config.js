@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { REST, Routes } from 'discord.js';
 import logger from './logger.js';
+import {scheduleBirthdayMessage} from "./utils/schedules.js";
 
 dotenv.config();
 
@@ -9,10 +10,11 @@ export const initialConfig = async (commands, client) =>{
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
     try{
-        //scheduleBirthdayMessage(client);
+        await scheduleBirthdayMessage(client);
+        logger.info('Birthday schedule job loaded')
     }
     catch (e){
-        logger.error('Failed to start birthday jobs' + e.message);
+        logger.error(e)
     }
 
     try {
