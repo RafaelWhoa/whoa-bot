@@ -3,6 +3,7 @@ import {PatoBans} from "../models/PatoBans.js";
 import logger from "../logger.js";
 import {Aniversarios} from "../models/Aniversarios.js";
 import dotenv from 'dotenv';
+import {DiscordServer} from "../models/DiscordServer.js";
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ export function clientEventsInit(client){
             logger.info('Aniversarios table synced')
         });
     })
-    client.login(process.env.TOKEN).then(r => {logger.info(`Logged in as ${client.user.tag}!`)})
+    client.login(process.env.TOKEN).then(() => {logger.info(`Logged in as ${client.user.tag}!`)})
 
     client.on(Events.InteractionCreate, async interaction => {
         if (!interaction.isChatInputCommand()) return;
@@ -38,4 +39,16 @@ export function clientEventsInit(client){
             }
         }
     });
+
+    client.on(Events.GuildCreate, async guild => {
+        DiscordServer.create({
+            server_id: guild.id,
+            server_name: guild.name,
+            server_owner_id: guild.ownerId,
+            server_member_count: guild.memberCount,
+            server_joined_at: guild.joinedAt,
+        }).then(() => {
+            logger.info(`Server ${guild.id} added to the database`) //Remove later
+        })
+    })
 }
