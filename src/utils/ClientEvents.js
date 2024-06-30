@@ -41,14 +41,20 @@ export function clientEventsInit(client){
     });
 
     client.on(Events.GuildCreate, async guild => {
-        DiscordServer.create({
-            server_id: guild.id,
-            server_name: guild.name,
-            server_owner_id: guild.ownerId,
-            server_member_count: guild.memberCount,
-            server_joined_at: guild.joinedAt,
+        DiscordServer.findOrCreate({
+            where: {
+                server_id: guild.id
+            },
+            defaults: {
+                server_name: guild.name,
+                server_owner_id: guild.ownerId,
+                server_member_count: guild.memberCount,
+                server_joined_at: guild.joinedAt,
+            }
         }).then(() => {
             logger.info(`Server ${guild.id} added to the database`) //Remove later
         })
     })
+
+    client.on
 }
