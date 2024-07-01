@@ -14,7 +14,7 @@ export function clientEventsInit(client) {
         await PatoBans.sync().then(() => {
             logger.info('PatoBans table synced')
         });
-        await Aniversarios.sync({force: true}).then(() => {
+        await Aniversarios.sync({force: false}).then(() => {
             logger.info('Aniversarios table synced')
         });
         await DiscordServer.sync({force: false}).then(() => {
