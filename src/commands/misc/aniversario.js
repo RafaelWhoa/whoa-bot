@@ -108,13 +108,17 @@ export const aniversarioCommands = {
             const target = interaction.options.getUser('user');
             const instance = await Aniversarios.findOne({
                 where:{
-                    user_id: target.id
+                    user_id: target.id,
+                    server_id: interaction.guild.id
                 }
             })
             if(instance){
                 await instance.destroy();
                 await setTimeout(1000);
                 await interaction.reply('Aniversário removido com sucesso!');
+            }
+            else{
+                await interaction.reply('A data do aniversário desse usuário não foi adicionada!');
             }
         }
         else if (subcommand === 'todos') {
@@ -146,7 +150,7 @@ export const aniversarioCommands = {
                 await interaction.reply(message);
             } catch (error) {
                 await interaction.reply({
-                    content: 'A data do aniversário desse usuário não foi adicionada!', ephemeral: true
+                    content: 'A data de aniversário desse usuário não foi adicionada!', ephemeral: true
                 });
                 logger.error(`Error to get birthday: ${error}` + error.message);
             }
