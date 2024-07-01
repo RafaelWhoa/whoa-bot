@@ -82,7 +82,7 @@ export function clientEventsInit(client) {
                 server_id: guild.id
             }
         }).then(() => {
-            logger.info(`Client removed from server ${guild.id}`) //Remove later
+            logger.info(`Client removed from server ${guild.id}`)
         })
     })
 }
