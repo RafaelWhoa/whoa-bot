@@ -4,11 +4,12 @@ import logger from "../logger.js";
 import {Aniversarios} from "../models/Aniversarios.js";
 import dotenv from 'dotenv';
 import {DiscordServer} from "../models/DiscordServer.js";
+import dayjs from "dayjs";
 
 dotenv.config();
 
 
-export function clientEventsInit(client){
+export function clientEventsInit(client) {
     client.once(Events.ClientReady, async () => {
         await PatoBans.sync().then(() => {
             logger.info('PatoBans table synced')
@@ -16,8 +17,13 @@ export function clientEventsInit(client){
         await Aniversarios.sync({force: true}).then(() => {
             logger.info('Aniversarios table synced')
         });
+        await DiscordServer.sync({force: false}).then(() => {
+            logger.info('DiscordServer table synced')
+        });
     })
-    client.login(process.env.TOKEN).then(() => {logger.info(`Logged in as ${client.user.tag}!`)})
+    client.login(process.env.TOKEN).then(() => {
+        logger.info(`Logged in as ${client.user.tag}!`)
+    })
 
     client.on(Events.InteractionCreate, async interaction => {
         if (!interaction.isChatInputCommand()) return;
@@ -33,15 +39,18 @@ export function clientEventsInit(client){
         } catch (error) {
             logger.error(error);
             if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.followUp({
+                    content: 'There was an error while executing this command!',
+                    ephemeral: true
+                });
             } else {
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.reply({content: 'There was an error while executing this command!', ephemeral: true});
             }
         }
     });
 
     client.on(Events.GuildCreate, async guild => {
-        DiscordServer.findOrCreate({
+        const [discordServer, created] = await DiscordServer.findOrCreate({
             where: {
                 server_id: guild.id
             },
@@ -49,12 +58,31 @@ export function clientEventsInit(client){
                 server_name: guild.name,
                 server_owner_id: guild.ownerId,
                 server_member_count: guild.memberCount,
-                server_joined_at: guild.joinedAt,
+                server_joined_at: guild.joinedAt
             }
-        }).then(() => {
-            logger.info(`Server ${guild.id} added to the database`) //Remove later
         })
+        if (!created) {
+            await discordServer.update({
+                    server_deleted_at: null
+                },
+                {
+                    where: {
+                        server_id: guild.id
+                    }
+                })
+            await discordServer.save()
+        }
     })
 
-    client.on
+    client.on(Events.GuildDelete, async guild => {
+        await DiscordServer.update({
+            server_deleted_at: dayjs()
+        }, {
+            where: {
+                server_id: guild.id
+            }
+        }).then(() => {
+            logger.info(`Client removed from server ${guild.id}`) //Remove later
+        })
+    })
 }

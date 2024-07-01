@@ -29,6 +29,9 @@ export const DiscordServer = sequelize.define('discord_server', {
         type: DataTypes.DATE,
         allowNull: false,
     },
+    server_deleted_at: {
+        type: DataTypes.DATE,
+    },
     server_birthday_channel: {
         type: DataTypes.STRING,
     }
