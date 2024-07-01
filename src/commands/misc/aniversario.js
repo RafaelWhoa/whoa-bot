@@ -7,6 +7,8 @@ import logger from '../../logger.js'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import {CalculateNextAge} from "../../utils/birthday.js";
+import P from "pino";
+
 dayjs.extend(customParseFormat);
 
 export const aniversarioCommands = {
@@ -24,13 +26,18 @@ export const aniversarioCommands = {
                     .setRequired(true))
                 .addStringOption(option => option.setName('birthday')
                     .setDescription('Data de aniversário (DD/MM/YYYY)')
+                    .setRequired(true)))
+            .addSubcommand(subcommand => subcommand
+                .setName('remover')
+                .setDescription('Remove um aniversário.')
+                .addUserOption(option => option.setName('user')
+                    .setDescription('Usuário')
                     .setRequired(true))))
         .addSubcommandGroup(subcommandGroup => subcommandGroup
             .setName('ver')
             .setDescription('Verifica aniversários.')
             .addSubcommand(subcommand => subcommand
-                .setName(
-                    'todos')
+                .setName('todos')
                 .setDescription('Ver todos os aniversários.'))
             .addSubcommand(subcommand => subcommand
                 .setName('usuario')
@@ -65,13 +72,16 @@ export const aniversarioCommands = {
             }
             if (!dayjs(birthdayFormatted).isValid()) {
                 await interaction.reply({
-                    content: locales[interaction.locale][subcommand].errorBirthday,
-                    ephemeral: true
+                    content: locales[interaction.locale][subcommand].errorBirthday, ephemeral: true
                 });
                 return;
             }
             try {
-                const instance = await Aniversarios.findOne({where: {username: target.username, server_id: interaction.guild.id}});
+                const instance = await Aniversarios.findOne({
+                    where: {
+                        username: target.username, server_id: interaction.guild.id
+                    }
+                });
                 if (instance) {
                     await instance.update({birthday: birthdayFormatted});
                     await instance.save();
@@ -93,7 +103,21 @@ export const aniversarioCommands = {
                 logger.error(`Error to add birthday: ${error}`, error);
                 await interaction.reply({content: locales[interaction.locale][subcommand].error, ephemeral: true});
             }
-        } else if (subcommand === 'todos') {
+        }
+        else if(subcommand === 'remover'){
+            const target = interaction.options.getUser('user');
+            const instance = await Aniversarios.findOne({
+                where:{
+                    user_id: target.id
+                }
+            })
+            if(instance){
+                await instance.destroy();
+                await setTimeout(1000);
+                await interaction.reply('Aniversário removido com sucesso!');
+            }
+        }
+        else if (subcommand === 'todos') {
             const instances = await Aniversarios.findAll({
                 where: {
                     server_id: interaction.guild.id,
@@ -122,8 +146,7 @@ export const aniversarioCommands = {
                 await interaction.reply(message);
             } catch (error) {
                 await interaction.reply({
-                    content: 'A data do aniversário desse usuário não foi adicionada!',
-                    ephemeral: true
+                    content: 'A data do aniversário desse usuário não foi adicionada!', ephemeral: true
                 });
                 logger.error(`Error to get birthday: ${error}` + error.message);
             }
