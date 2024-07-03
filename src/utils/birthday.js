@@ -13,36 +13,16 @@ export const CalculateNextAge = (birthday) => {
 }
 
 export const GetTodayBirthdays = async (client) => {
+    const today = dayjs();
+
     const todayBirthdays = await Aniversarios.findAll({
-        where: sequelize
-            .where(sequelize
-                .fn('date_part',
-                    'day',
-                    sequelize
-                        .col('birthday')),
-                '=',
-                dayjs()
-                    .format('DD')),
-        and: sequelize
-            .where(sequelize
-                .fn('date_part',
-                    'month',
-                    sequelize.col('birthday')),
-                '=', dayjs()
-                    .format('MM')),
-        [Op.and]: sequelize.where(sequelize
-                .fn('date_part',
-                    'day',
-                    sequelize
-                        .col('birthday')),
-            '=',
-            dayjs()
-                .format('DD'), sequelize.where(sequelize
-                    .fn('date_part',
-                        'month',
-                        sequelize.col('birthday')),
-                '=', dayjs()
-                    .format('MM')))});
+        where: {
+            [Op.and]: [
+                sequelize.where(sequelize.fn('date_part', 'day', sequelize.col('birthday')), today.format('DD')),
+                sequelize.where(sequelize.fn('date_part', 'month', sequelize.col('birthday')), today.format('MM'))
+            ]
+        }
+    });
 
     if (todayBirthdays.length > 0) {
         let message = `Hoje é aniversário de: \n`;
