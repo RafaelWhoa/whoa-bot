@@ -28,7 +28,7 @@ export const GetTodayBirthdays = async (client) => {
         let message = `Hoje é aniversário de: \n`;
         todayBirthdays.forEach(user => {
             const userId = user.dataValues.user_id;
-            message += `<@${userId}> - Dê os parabéns à ele(a)! 🎉🎉🎉\n`;
+            message += `<@${userId}> - Dê os parabéns a ele(a)! 🎉🎉🎉\n`;
         })
         await client.channels.cache.get(process.env.BIRTHDAY_CHANNEL).send(message);
     }
