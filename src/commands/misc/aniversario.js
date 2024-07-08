@@ -145,8 +145,7 @@ export const aniversarioCommands = {
                 const birthday = instance.dataValues.birthday;
                 const day = dayjs(birthday).format('DD');
                 const month = dayjs(birthday).format('MM');
-                const year = dayjs(birthday).format('YYYY');
-                message += `<@${username}> irá fazer ${CalculateNextAge(birthday).year() - year} anos em ${day}/${month}/${CalculateNextAge(birthday).year()}\n`;
+                message += `<@${username}> faz aniversário em ${day}/${month}\n`;
                 await interaction.reply(message);
             } catch (error) {
                 await interaction.reply({
