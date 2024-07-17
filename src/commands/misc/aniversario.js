@@ -3,11 +3,10 @@
 import {SlashCommandBuilder} from 'discord.js'
 import {setTimeout} from "timers/promises";
 import {Aniversarios} from '../../models/Aniversarios.js';
-import logger from '../../logger.js'
+import {logger} from "../../utils/utils.index.js";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
-import {CalculateNextAge} from "../../utils/birthday.js";
-import P from "pino";
+
 
 dayjs.extend(customParseFormat);
 

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import {initialConfig} from './config.js';
-import logger from './logger.js';
+import {logger} from "./utils/utils.index.js";
 
 dotenv.config();
 

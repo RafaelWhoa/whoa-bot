@@ -1,11 +1,12 @@
 import dotenv from 'dotenv';
 import {Client, Collection, GatewayIntentBits, REST, Routes} from 'discord.js';
-import logger from './logger.js';
+import {logger} from "./utils/utils.index.js";
 import {scheduleBirthdayMessage} from "./utils/schedules.js";
 import {fileURLToPath} from "url";
 import path from "node:path";
 import fs from "node:fs";
 import {clientEventsInit} from "./utils/ClientEvents.js";
+import {recieveResponseFromQueue} from "./utils/reabbitmq_reciever.js";
 
 dotenv.config();
 

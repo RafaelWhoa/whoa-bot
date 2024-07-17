@@ -1,6 +1,6 @@
 import {Events} from "discord.js";
 import {PatoBans} from "../models/PatoBans.js";
-import logger from "../logger.js";
+import {logger} from "./utils.index.js";
 import {Aniversarios} from "../models/Aniversarios.js";
 import dotenv from 'dotenv';
 import {DiscordServer} from "../models/DiscordServer.js";

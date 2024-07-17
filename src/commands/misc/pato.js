@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from 'discord.js'
 import {setTimeout} from "timers/promises";
 import {PatoBans} from '../../models/PatoBans.js'
-import logger from '../../logger.js'
+import {logger} from "../../utils/utils.index.js";
 
 async function incrementCounter() {
     try {
