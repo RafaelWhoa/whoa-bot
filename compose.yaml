@@ -11,6 +11,7 @@ services:
   server:
     build:
       context: .
+    restart: always
     environment:
       NODE_ENV: production
       TOKEN: ${TOKEN}
@@ -26,14 +27,14 @@ services:
     ports:
       - 5002:5002
   db:
-    image: postgres
+    image: postgres:17.0
     restart: always
     user: postgres
     environment:
       - POSTGRES_DB=${DATABASE}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - 5431:5432
+      - 5432:5432
     expose:
       - 5432
     healthcheck:
